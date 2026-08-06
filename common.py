@@ -860,29 +860,35 @@ def nombre_final(nombre_actual, data, puntuacion, max_kw=3):
     """Devuelve el nombre de archivo propuesto (sin extensión).
 
     Prioridad del nombre base:
-      1) Título original interesante (preservar_titulo=si de la IA, o
-         título limpio con sentido) — se conserva añadido.
-      2) nombre_sugerido de la IA si el original es "raro".
-      3) slug del resumen de la IA.
+      1) Título original SOLO si hay criterio claro de que es interesante
+         (la IA dice preservar_titulo=si, o el título limpio tiene >=2
+         palabras con sentido real).
+      2) nombre_sugerido de la IA (si lo da).
+      3) POR DEFECTO: slug del resumen de la IA (nunca se conserva un
+         nombre basura como "zaaaaa11").
     Luego se añaden las etiquetas: (kw1;kw2;kw3;p<PUNT>;<sexualizacion>).
     """
     import re as _re
     original = nombre_actual
     titulo = limpiar_titulo(original)
     sugerido = (data or {}).get('nombre_sugerido') or ''
-    preservar = ((data or {}).get('preservar_titulo') == 'si') or (
-        titulo and len(titulo.split()) >= 2)
+    # criterio claro de preservación: la IA lo valida, o el título limpio
+    # tiene al menos 2 palabras con longitud media real
+    if titulo:
+        palabras = titulo.split()
+        titulo_sentido = (len(palabras) >= 2 and
+                          sum(len(p) for p in palabras) / len(palabras) >= 3.5)
+    else:
+        titulo_sentido = False
+    preservar = ((data or {}).get('preservar_titulo') == 'si') or titulo_sentido
     if preservar and titulo:
         base = _slug(titulo, 70)
-    elif nombre_raro(original):
-        if sugerido:
-            base = _slug(sugerido, 60)
-        else:
-            resumen = (data or {}).get('resumen') or \
-                      ((data or {}).get('descripcion') or '')[:60]
-            base = _slug(resumen, 60)
+    elif sugerido:
+        base = _slug(sugerido, 60)
     else:
-        base = _slug(original, 80)
+        resumen = (data or {}).get('resumen') or \
+                  ((data or {}).get('descripcion') or '')[:60]
+        base = _slug(resumen, 60)
     kws = []
     for c in ((data or {}).get('categorias') or [])[:max_kw]:
         kws.append(_slug(str(c), 20))
