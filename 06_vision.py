@@ -32,8 +32,8 @@ sys.path.insert(0, str(Path(__file__).parent))
 import common
 from common import LOG, conectar
 
-API = 'http://legion:11434/api/generate'
-API_LLAMACPP = 'http://legion:8080/v1/chat/completions'
+API = 'http://192.168.1.136:11434/api/generate'
+API_LLAMACPP = 'http://192.168.1.136:8080/v1/chat/completions'
 BACKEND = os.environ.get('VLM_BACKEND', 'ollama')  # ollama | llamacpp
 
 EXT = ('.jpg', '.jpeg', '.png', '.webp', '.bmp')
@@ -89,7 +89,7 @@ def clasificar_una(ruta):
         api, data=json.dumps(cuerpo).encode(),
         headers={'Content-Type': 'application/json'})
     try:
-        with urllib.request.urlopen(req, timeout=300) as r:
+        with common.abrir(req, timeout=300) as r:
             d = json.loads(r.read())
     except Exception as e:
         return ruta, None, str(e)
@@ -129,7 +129,7 @@ def clasificar_una(ruta):
                 req2 = urllib.request.Request(
                     api2, data=json.dumps(cuerpo).encode(),
                     headers={'Content-Type': 'application/json'})
-                with urllib.request.urlopen(req2, timeout=300) as r2:
+                with common.abrir(req2, timeout=300) as r2:
                     d2 = json.loads(r2.read())
                 resp2 = (d2.get('response') or '').strip()                     if BACKEND != 'llamacpp' else                     d2['choices'][0]['message']['content'].strip()
                 if resp2.startswith('```'):

@@ -248,6 +248,21 @@ def ruta_de_db(s):
     return s.encode('latin-1').decode('utf-8', 'surrogatepass')
 
 
+# Opener SIN proxy: el servidor de inferencia es local/LAN y el proxy del
+# sistema (WinINET) acepta conexiones pero nunca responde en contextos
+# tipo tareas programadas (schtasks), colgando urllib indefinidamente.
+_OPENER = None
+
+
+def abrir(req, timeout=300):
+    """urlopen sin proxy (para Legion/Ollama en LAN)."""
+    global _OPENER
+    if _OPENER is None:
+        import urllib.request as _ur
+        _OPENER = _ur.build_opener(_ur.ProxyHandler({}))
+    return _OPENER.open(req, timeout=timeout)
+
+
 # ---------------------------------------------------------------------------
 # 7. BASE DE DATOS Y LOG
 # ---------------------------------------------------------------------------

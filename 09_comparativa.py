@@ -30,8 +30,8 @@ sys.path.insert(0, str(Path(__file__).parent))
 import common
 from common import LOG
 
-API_OLLAMA = 'http://legion:11434/api/generate'
-API_LLAMACPP = 'http://legion:8080/v1/chat/completions'
+API_OLLAMA = 'http://192.168.1.136:11434/api/generate'
+API_LLAMACPP = 'http://192.168.1.136:8080/v1/chat/completions'
 TAXONOMIA = (
     "muscle, bodybuilding, posing, gym, workout, flex, physique, "
     "fantasy, cosplay, superheroe, fandom, furry, bondage, nude, "
@@ -62,7 +62,7 @@ def clasificar(ruta, modelo, api, temp, max_tokens):
     req = urllib.request.Request(
         api_url, data=json.dumps(cuerpo).encode(),
         headers={'Content-Type': 'application/json'})
-    with urllib.request.urlopen(req, timeout=600) as r:
+    with common.abrir(req, timeout=600) as r:
         d = json.loads(r.read())
     if api == 'ollama':
         resp = (d.get('response') or '').strip()
@@ -97,7 +97,7 @@ def verificar_fisico(ruta, b64, api):
             req = urllib.request.Request(
                 API_OLLAMA, data=json.dumps(cuerpo).encode(),
                 headers={'Content-Type': 'application/json'})
-            with urllib.request.urlopen(req, timeout=120) as r:
+            with common.abrir(req, timeout=120) as r:
                 d = json.loads(r.read())
             resp = (d.get('response') or '').strip().lower()
         else:
@@ -110,7 +110,7 @@ def verificar_fisico(ruta, b64, api):
             req = urllib.request.Request(
                 API_LLAMACPP, data=json.dumps(cuerpo).encode(),
                 headers={'Content-Type': 'application/json'})
-            with urllib.request.urlopen(req, timeout=120) as r:
+            with common.abrir(req, timeout=120) as r:
                 d = json.loads(r.read())
             resp = d['choices'][0]['message']['content'].strip().lower()
         return resp.startswith('si')
