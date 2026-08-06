@@ -59,6 +59,13 @@ def pendientes(con, limite, reintentar=False):
 
 def clasificar_una(ruta):
     """Devuelve (ruta, respuesta_dict|None, error|None)."""
+    # pre-filtro: archivo corrupto (no es imagen válida) -> sin gastar GPU
+    try:
+        from PIL import Image
+        with Image.open(ruta) as im:
+            im.verify()
+    except Exception:
+        return ruta, None, 'imagen corrupta/no identificable'
     try:
         with open(ruta, 'rb') as f:
             b64 = base64.b64encode(f.read()).decode()
