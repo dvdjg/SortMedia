@@ -325,6 +325,10 @@ def crear_esquema(con):
         con.execute('ALTER TABLE inventario ADD COLUMN renombrado TEXT')
     except Exception:
         pass
+    try:
+        con.execute('ALTER TABLE vision ADD COLUMN preservar_titulo TEXT')
+    except Exception:
+        pass
 
 
 def marca_progreso(con, fase, valor):

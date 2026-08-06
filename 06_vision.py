@@ -216,7 +216,7 @@ def main():
                              os.path.basename(ruta)[:250], None,
                              None, None, None, None, None, None, None,
                              None, None, None, None, None, None, None,
-                              None, None, None, None, None, None))
+                             None, None, None, None, None, None, None))
             if len(lote) >= 50:
                 con.executemany(
                     'INSERT OR REPLACE INTO vision(ruta, modelo, json, '
@@ -227,8 +227,7 @@ def main():
                     'es_familiar, menores, hay_hombre_atractivo, personas, '
                     'estilo, posible, fantasia_verosimil, defectos, '
                     'organo_imposible, violencia, admiradores, puntuacion) '
-                    'VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'
-                    '?,?,?,?,?,?,?,?,?,?)', lote)
+                    'VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', lote)
                 lote = []
                 con.commit()
             if data and args.escribir_exif and not args.dry_run:
@@ -254,8 +253,7 @@ def main():
             'fisico_visible, es_familiar, menores, hay_hombre_atractivo, '
             'personas, estilo, posible, fantasia_verosimil, defectos, '
             'organo_imposible, violencia, admiradores, puntuacion) '
-            'VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'
-            '?,?,?,?,?,?)', lote)
+            'VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', lote)
     con.commit()
     LOG.info('FIN: %d clasificadas (ok=%d err=%d) en %.0fs',
              hechos, ok, err, time.time() - t0)
