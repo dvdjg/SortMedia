@@ -230,7 +230,7 @@ def main():
                     'VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', lote)
                 lote = []
                 con.commit()
-            if data and args.escribir_exif and not args.dry_run:
+            if data and args.escribir_exif:
                 try:
                     common.escribir_metadatos(
                         ruta, data, common.calcular_puntuacion(data)[0],
