@@ -1,0 +1,20 @@
+# Datos locales y privados: NO se suben al repositorio
+# (contienen rutas y clasificaciones de la biblioteca local)
+estado/
+salida/
+*.db
+*.db-wal
+*.db-shm
+
+# Python
+__pycache__/
+*.pyc
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporales
+*.tmp
+*.log
