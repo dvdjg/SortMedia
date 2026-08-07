@@ -25,6 +25,7 @@ import common
 from common import conectar
 
 MARCA = common.SALIDA_DIR / 'vision_progreso.txt'
+MARCA_FALLOS = common.SALIDA_DIR / 'vision_estancado.txt'
 UMBRAL_SEG = 20 * 60  # sin progreso durante 20 min -> reiniciar
 CLAVE = r'C:\Users\David\Documents\id_ed25519'
 LEGION = '192.168.1.136'
@@ -93,10 +94,23 @@ def main():
     vivo = proceso_batch_vivo()
     if anterior is not None and n == anterior and \
             (ahora - ultimo) >= UMBRAL_SEG:
-        print(f'Sin progreso desde hace {(ahora-ultimo)/60:.0f} min '
-              f'({n} filas) -> reiniciando')
-        reiniciar()
-        n = contar_ok()
+        # regla de 2 comprobaciones consecutivas: no reiniciar a la primera
+        fallos = 0
+        if MARCA_FALLOS.exists():
+            try:
+                fallos = int(MARCA_FALLOS.read_text(encoding='utf-8').strip())
+            except ValueError:
+                pass
+        fallos += 1
+        MARCA_FALLOS.write_text(str(fallos), encoding='utf-8')
+        print(f'Sin progreso ({n}) — comprobación {fallos}/2')
+        if fallos >= 2:
+            print('>>> Reiniciando batch (estancamiento confirmado)')
+            reiniciar()
+            MARCA_FALLOS.write_text('0', encoding='utf-8')
+            n = contar_ok()
+    else:
+        MARCA_FALLOS.write_text('0', encoding='utf-8')
     with open(MARCA, 'a', encoding='utf-8') as f:
         f.write(f'{ahora:.0f}|{n}\n')
     print(f'ok={n} | proceso_vivo={vivo} | marca actualizada')
